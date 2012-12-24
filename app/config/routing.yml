@@ -1,0 +1,14 @@
+cubic_mushroom_word_press_file_manager:
+    resource: "@CubicMushroomWordPressFileManagerBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+cubic_mushroom_file_manager:
+    resource: "@CubicMushroomFileManagerBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+# Internal routing configuration to handle ESI
+#_internal:
+#    resource: "@FrameworkBundle/Resources/config/routing/internal.xml"
+#    prefix:   /_internal
