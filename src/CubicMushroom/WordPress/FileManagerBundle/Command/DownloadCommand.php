@@ -11,9 +11,9 @@
  * @license MIT
  */
 
-namespace CubicMushroom\FileManagerBundle\Command;
+namespace CubicMushroom\WordPress\FileManagerBundle\Command;
 
-use CubicMushroom\FileManagerBundle\Exception\UnknowWordPressVersionException;
+use CubicMushroom\WordPress\FileManagerBundle\Exception\UnknowWordPressVersionException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,7 +54,7 @@ class DownloadCommand extends ContainerAwareCommand
 
         try {
             $fileManager->downloadWordPress($version);
-        } catch (\CubicMushroom\FileManagerBundle\Exception\UnknowWordPressVersionException $e) {
+        } catch (\CubicMushroom\WordPress\FileManagerBundle\Exception\UnknowWordPressVersionException $e) {
             $output->writeln('');
             $output->writeln('<error>' . $e->getMessage() . '</error>');
             $output->writeln(

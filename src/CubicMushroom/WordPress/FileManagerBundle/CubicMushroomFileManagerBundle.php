@@ -1,6 +1,6 @@
 <?php
 
-namespace CubicMushroom\FileManagerBundle;
+namespace CubicMushroom\WordPress\FileManagerBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

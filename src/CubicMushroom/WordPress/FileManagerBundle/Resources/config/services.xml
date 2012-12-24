@@ -6,7 +6,7 @@
 
     <!--
     <parameters>
-        <parameter key="cubic_mushroom_file_manager.example.class">CubicMushroom\FileManagerBundle\Example</parameter>
+        <parameter key="cubic_mushroom_file_manager.example.class">CubicMushroom\WordPress\FileManagerBundle\Example</parameter>
     </parameters>
 
     <services>

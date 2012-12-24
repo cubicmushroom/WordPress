@@ -1,6 +1,6 @@
 <?php
 
-namespace CubicMushroom\FileManagerBundle\DependencyInjection;
+namespace CubicMushroom\WordPress\FileManagerBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

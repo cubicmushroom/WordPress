@@ -1,6 +1,6 @@
 <?php
 
-namespace CubicMushroom\FileManagerBundle\Tests\Controller;
+namespace CubicMushroom\WordPress\FileManagerBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

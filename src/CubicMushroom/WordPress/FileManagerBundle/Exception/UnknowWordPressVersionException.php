@@ -11,7 +11,7 @@
  * @license MIT
  */
 
-namespace CubicMushroom\FileManagerBundle\Exception;
+namespace CubicMushroom\WordPress\FileManagerBundle\Exception;
 
 /**
  * Exception thrown when attempting to download a non-existent version of Wordpress

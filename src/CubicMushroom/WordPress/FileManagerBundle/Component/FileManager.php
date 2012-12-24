@@ -10,10 +10,10 @@
  * @license MIT
  */
 
-namespace CubicMushroom\FileManagerBundle\Component;
+namespace CubicMushroom\WordPress\FileManagerBundle\Component;
 
 use CubicMushroom\FileHelper\FileHelper;
-use CubicMushroom\FileManagerBundle\Exception;
+use CubicMushroom\WordPress\FileManagerBundle\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 use Webcreate\Vcs\Svn;

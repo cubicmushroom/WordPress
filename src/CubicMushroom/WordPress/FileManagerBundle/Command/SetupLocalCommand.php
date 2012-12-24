@@ -11,7 +11,7 @@
  * @license MIT
  */
 
-namespace CubicMushroom\FileManagerBundle\Command;
+namespace CubicMushroom\WordPress\FileManagerBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
