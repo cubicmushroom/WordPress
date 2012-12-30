@@ -4,8 +4,11 @@ imports:
 
 services:
     filemanager:
-        class:      CubicMushroom\FileManagerBundle\Component\FileManager
-        arguments:  [@service_container]
+        class:      CubicMushroom\WordPress\FileManagerBundle\Component\FileManager
+        arguments:  [%kernel.root_dir%, %tmp_folder%]
+    config:
+        class:      CubicMushroom\WordPress\ConfigBundle\Component\Config
+        arguments:  [%kernel.root_dir%]
 
 framework:
     #esi:             ~

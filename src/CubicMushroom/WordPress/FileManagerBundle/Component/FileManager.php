@@ -13,7 +13,10 @@
 namespace CubicMushroom\WordPress\FileManagerBundle\Component;
 
 use CubicMushroom\FileHelper\FileHelper;
+use CubicMushroom\Symfony\Component\Console\Output\OutputStub;
 use CubicMushroom\WordPress\FileManagerBundle\Exception;
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 use Webcreate\Vcs\Svn;
@@ -32,39 +35,124 @@ use Webcreate\Vcs\Common\Pointer;
 class FileManager {
 
     /**
-     * Reference to 
-     * @var ContainerInterface object
+     * @var string Application root
      */
-    protected $container;
+    protected $appRoot;
+
+    /**
+     * @var string Directory to download the files to
+     */
+    protected $downloadDir;
+
+    /**
+     * @var Stores WordPress repository access object
+     */
+    protected $vcs;
+
+    /**
+     * @var object Output Interface object used to output during console commands
+     */
+    protected $output;
 
     /**
      * Stores the service container to $this->container
      *
      * @param ContainerInterface $contains Dependency Injection Service Container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct($appRoot, $tmpDir)
     {
-        $this->container = $container;
+        $this->appRoot = $appRoot;
+        $this->downloadDir = $tmpDir;
+        $this->output = new OutputStub();
     }
+
+    /*********************
+     * Getters & Setters *
+     *********************/
+
+    /**
+     * Returns the Version Control access object, creating it first if necessary
+     *
+     * @return object
+     */
+    protected function getVcs()
+    {
+        if (empty($this->vcs)) {
+            $this->vcs = new Svn('http://core.svn.wordpress.org');
+        }
+        return $this->vcs;
+    }
+
+    /**
+     * Sets the download directory
+     *
+     * @param string $dir Directory 
+     */
+    public function setDownloadDir($dir)
+    {
+        $this->downloadDir = $dir;
+    }
+
+    /**
+     * Allows the setting of an output object to be used when outputting to console
+     *
+     * @param OutputInterface $output Output interface object
+     */
+    public function setOutput(OutputInterface $output)
+    {
+        $this->output = $output;
+    }
+
+    /******************
+     * Action methods *
+     ******************/
 
     /**
      * Downloads a copy of WordPress from the Subversion repository
      *
      * @param string $version The version number or WordPress to download.  If not
      *                        given, defaults to latest version
+     *
+     * @return string Returns the full path to the download file
      */
     public function downloadWordPress($version = null)
     {
+        if (empty($version) || 'latest' == $version) {
+            $this->output->writeln(
+                "<info>Attempting to download the latest version of WordPress</info>"
+            );
+        } else {
+            $this->output->writeln(
+                "<info>Attempting to download WordPress version $version"
+            );
+            $wpArchive = $this->getArchiveFile($version);
 
-        $svn = new Svn('http://core.svn.wordpress.org');
+            if ($this->checkArchiveExists($version)) {
+                return $this->getArchiveFile($version);
+            }
+        }
+
+        $this->output->writeln('<info>Fetching WordPress versions</info>');
+
+        $vcs = $this->getVcs();
 
         // Get SVN tags
-        $tags = $svn->tags();
+        $tags = $vcs->tags();
 
         if (empty($version) || 'latest' == $version) {
             rsort($tags);
             $version = $tags[0];
+            $this->output->writeln(
+                "<info>Latest version is $version</info>"
+            );
+
+            if ($this->checkArchiveExists($version)) {
+                return $this->getArchiveFile($version);
+            }
+
+            $wpArchive = $this->getArchiveFile($version);
         }
+echo $wpArchive; exit;
 
         if (!in_array($version, $tags)) {
             throw new Exception\UnknowWordPressVersionException(
@@ -73,30 +161,14 @@ class FileManager {
             );
         }
 
-        // Get temp folder
-        $tmpDir = $this->container->getParameter('tmp_folder');
-        if (empty($tmpDir)) {
-            $tmpDir = 'tmp';
-        }
-        if ('/' != substr($tmpDir, 0, 1)) {
-            $tmpDir = dirname($this->container->get('kernel')->getRootDir()) . "/$tmpDir";
-        }
-
-        $wpArchive = "$tmpDir/wordpress/wordpress-$version.tar.gz";
-echo "wpArchive: $wpArchive\n";
-        $downloadDir = preg_replace('/\.tar\.gz$/', '', $wpArchive);
-echo "downloadDir: $downloadDir\n";
-
-        // Check if version is already downloaded
-        if (file_exists($wpArchive)) {
-            return $wpArchive;
-        }
+        $this->output->writeln("<info>Beginning download</info>");
 
         // Switch to the relevant version tag
-        $svn->setPointer(new Pointer($version, Pointer::TYPE_TAG));
+        $vcs->setPointer(new Pointer($version, Pointer::TYPE_TAG));
 
         // Download the files
-        $svn->export("/", $downloadDir);
+        $downloadDir = preg_replace('/\.tar\.gz$/', '', $wpArchive);
+        $vcs->export("/", $downloadDir);
 
         // Now combine into an archive & compress
         $tarProcess = new Process("tar -czf $wpArchive *", $downloadDir);
@@ -109,8 +181,48 @@ echo "downloadDir: $downloadDir\n";
         $fileHelper = new FileHelper();
 
         $fileHelper->rmdir($downloadDir);
-        echo "Created $wpArchive archive"; exit;
 
-        // And delete the downloaded files
+        $this->output->writeln(
+            "<info>WordPress version $version downloaded to $wpArchive</info>"
+        );
+
+        return $this->getArchiveFile($version);
+    }
+
+    /**
+     * Calculates the WP archive file to use
+     *
+     * @param string $version Version number
+     *
+     * @return string Full path & filename string
+     */
+    protected function getArchiveFile($version)
+    {
+        // Get temp folder
+        $tmpDir = $this->downloadDir;
+        if ('/' != substr($this->downloadDir, 0, 1)) {
+            $tmpDir = dirname($this->appRoot) . "/$tmpDir";
+        }
+
+        return "$tmpDir/wordpress-$version.tar.gz";
+    }
+
+    /**
+     * Checks if archive is already downloaded & reports to $this->output, if so
+     *
+     * @param string $version Version number to check for
+     *
+     * @return boolean
+     */
+    protected function checkArchiveExists($version)
+    {
+        $wpArchive = $this->getArchiveFile($version);
+        if (file_exists($wpArchive)) {
+            $this->output->writeln(
+                "<info>Version $version already downloaded</info>"
+            );
+            $this->output->writeln("<info>File can be found at $wpArchive</info>");
+            return $wpArchive;
+        }
     }
 }

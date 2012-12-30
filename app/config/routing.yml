@@ -1,10 +1,10 @@
-cubic_mushroom_word_press_file_manager:
-    resource: "@CubicMushroomWordPressFileManagerBundle/Controller/"
+cubic_mushroom_word_press_config:
+    resource: "@CubicMushroomWordPressConfigBundle/Controller/"
     type:     annotation
     prefix:   /
 
-cubic_mushroom_file_manager:
-    resource: "@CubicMushroomFileManagerBundle/Controller/"
+cubic_mushroom_word_press_file_manager:
+    resource: "@CubicMushroomWordPressFileManagerBundle/Controller/"
     type:     annotation
     prefix:   /
 

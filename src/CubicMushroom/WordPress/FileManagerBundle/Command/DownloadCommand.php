@@ -43,18 +43,31 @@ class DownloadCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'What version to download.  Leave blank to download the latest version',
                 'latest'
+            )
+            ->addOption(
+                'dir',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Name the folder to download archive to'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $fileManager = $this->getContainer()->get('filemanager');
+        $fileManager->setOutput($output);
 
         $version = $input->getArgument('version');
+        $downloadDir = $input->getOption('dir');
 
         try {
-            $fileManager->downloadWordPress($version);
-        } catch (\CubicMushroom\WordPress\FileManagerBundle\Exception\UnknowWordPressVersionException $e) {
+            if (!empty($downloadDir)) {
+                $fileManager->setDownloadDir($downloadDir);
+            }
+            $output->writeln("Achive file: " . $fileManager->downloadWordPress($version));
+        } catch (
+            \CubicMushroom\WordPress\FileManagerBundle\Exception\UnknowWordPressVersionException $e
+        ) {
             $output->writeln('');
             $output->writeln('<error>' . $e->getMessage() . '</error>');
             $output->writeln(
@@ -66,7 +79,5 @@ class DownloadCommand extends ContainerAwareCommand
         } catch (\Exception $e) {
             $output->writeln($e->getMessage());
         }
-
-
     }
 }

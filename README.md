@@ -15,8 +15,6 @@ Important Files
                command before it has been created
 
 
-
-
 Configuration
 -------------
 * Temp directory - Folder used to download files to
@@ -24,9 +22,16 @@ Configuration
                    Relative paths are relative to the app's app/ folder
 
 
+Commands
+--------
+
+Each of these commands start with `app/console ...`
+
+* wordpress:download:version [version] - Downloads a version of WordPress from the
+                                         WordPress SVN repo into the tmp dir
+
 Credits
 -------
-
 This package relies on the following 3rd party packages...
 
 * symfony/symfony - The Symfony 2 framework
@@ -34,11 +39,17 @@ This package relies on the following 3rd party packages...
 
 Roadmap
 -------
-Proposed commands...
+To Do...
 
-* init              - Sets up config of local environment.  This should be called
+* Config file generation (using init console command)
+* Update download to use config file, rather than parameters.yml file
+
+
+Proposed commands (wordpress:xxx)...
+
+* :init             - Sets up config of local environment.  This should be called
                       automatically if no config file is found when running any other
                       commands
-* setup-local       - Sets up a local WordPress environment
-* setup-remote      - Sets up a remote WordPress environment via SFTP/FTP
-* clone-from-remote - Clones a copy of a remote WP site to local machine
+* :setup:local      - Sets up a local WordPress environment
+* :setup:remote     - Sets up a remote WordPress environment via SFTP/FTP
+* :clone:remote     - Clones a copy of a remote WP site to local machine
